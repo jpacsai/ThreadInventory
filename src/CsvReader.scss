@@ -1,0 +1,13 @@
+.forms {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+
+  .palette_photo {
+    height: 70px;
+  }
+
+  .not_owned_thread {
+    color: red;
+  }
+}
