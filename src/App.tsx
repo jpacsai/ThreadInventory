@@ -1,7 +1,12 @@
 import useGoogleSheets from 'use-google-sheets';
 
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+
+import Home from './Home';
+import Inventory from './Inventory';
 import Palettes from './Palettes';
+
+import './App.css';
 
 export type Thread = {
   number: string;
@@ -30,8 +35,8 @@ export type Palette = CommonPalette & {
 
 function App() {
   const { data, loading, error } = useGoogleSheets({
-    apiKey: process.env.REACT_APP_API_KEY || 'nope',
-    sheetId: process.env.REACT_APP_SHEETS_ID || 'nope',
+    apiKey: process.env.REACT_APP_API_KEY || '',
+    sheetId: process.env.REACT_APP_SHEETS_ID || '',
   });
 
   if (loading) {
@@ -69,14 +74,32 @@ function App() {
   const palettes = parsePalettes(data[1].data as RawPalette[]);
 
   return (
-    <div className="App">
-      <header className="App-header">
-        {/* <CsvReader /> */}
-        <div>
-          <Palettes palettes={palettes} inventory={inventory} />
-        </div>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <nav>
+          <ul>
+            <li>
+              <Link to="/">Home</Link>
+            </li>
+            <li>
+              <Link to="/inventory">Inventory</Link>
+            </li>
+            <li>
+              <Link to="/palettes">Palettes</Link>
+            </li>
+          </ul>
+        </nav>
+        <header className="App-header">
+          <div>
+            <Routes>
+              <Route path="/inventory" element={<Inventory inventory={inventory} />} />
+              <Route path="/palettes" element={<Palettes inventory={inventory} palettes={palettes} />} />
+              <Route path="/" element={<Home />} />
+            </Routes>
+          </div>
+        </header>
+      </div>
+    </Router>
   );
 }
 
