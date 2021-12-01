@@ -1,7 +1,6 @@
-// import classnames from 'classnames';
 import { Thread } from './App';
 
-// import './CsvReader.scss';
+import './Inventory.scss';
 
 export type InventoryProps = {
   inventory: Thread[];
@@ -23,7 +22,7 @@ export default function Inventory({ inventory }: InventoryProps) {
             <tr key={i}>
               <td>{item.number}</td>
               <td>{item.name}</td>
-              <td>{item.owned ? 'X' : ''}</td>
+              <td className="inventory_owned">{item.owned ? 'X' : ''}</td>
             </tr>
           ))}
         </tbody>
