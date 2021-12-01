@@ -8,10 +8,22 @@ import Palettes from './Palettes';
 
 import './App.css';
 
-export type Thread = {
+type RawThread = {
   number: string;
   name?: string;
   owned: boolean;
+};
+
+export type Thread = {
+  number: string | number;
+  name?: string;
+  owned: boolean;
+};
+
+const blankThread: Thread = {
+  number: '',
+  name: '',
+  owned: false,
 };
 
 export type CommonPalette = {
@@ -30,8 +42,11 @@ export type RawPalette = CommonPalette & {
 };
 
 export type Palette = CommonPalette & {
-  threads: (string | number)[];
+  threads: Thread[];
 };
+
+const parseThreadNumbers = (thread: string): string | number =>
+  Number.isNaN(Number(thread)) ? thread : Number(thread);
 
 function App() {
   const { data, loading, error } = useGoogleSheets({
@@ -58,19 +73,29 @@ function App() {
     return [...sortedThreads.str, ...sortedThreads.num];
   };
 
+  const rawInventory = data[0].data as RawThread[];
+  const inventory = rawInventory.map(
+    (thread): Thread => ({ ...thread, number: parseThreadNumbers(thread.number), owned: !!thread.owned })
+  );
+
   const parsePalettes = (palettes: RawPalette[]): Palette[] => {
     const parsed = palettes.map((palette) => {
       const { thread_1, thread_2, thread_3, thread_4, thread_5, thread_6, ...rest } = palette;
 
       const threads = [thread_1, thread_2, thread_3, thread_4, thread_5, thread_6];
       const eachPalettes = { ...rest, threads: sortThreads(threads) };
-      return eachPalettes;
+      const completePalettes = eachPalettes.threads.map((thread) => {
+        const th = inventory.find((t) => t.number === thread);
+
+        return th || blankThread;
+      });
+
+      return { ...eachPalettes, threads: completePalettes };
     });
 
     return parsed;
   };
 
-  const inventory = data[0].data as Thread[];
   const palettes = parsePalettes(data[1].data as RawPalette[]);
 
   return (

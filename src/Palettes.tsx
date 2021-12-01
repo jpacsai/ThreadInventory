@@ -1,4 +1,5 @@
 import classnames from 'classnames';
+
 import { Palette, Thread } from './App';
 
 import './Palettes.scss';
@@ -8,21 +9,7 @@ export type PalettesProps = {
   inventory: Thread[];
 };
 
-export default function Palettes({ palettes, inventory }: PalettesProps) {
-  const parseThreadNumbers = (thread: string): string | number =>
-    Number.isNaN(Number(thread)) ? thread : Number(thread);
-
-  const getOwnedThreads = () => {
-    if (inventory.length === 0) return;
-    const owned = inventory.reduce(
-      (acc: (string | number)[], item) => (item.owned ? [...acc, parseThreadNumbers(item.number)] : acc),
-      []
-    );
-    return owned;
-  };
-
-  const ownedThreads = getOwnedThreads(); // TODO useMemo
-
+export default function Palettes({ palettes }: PalettesProps) {
   return (
     <div className="forms">
       <table>
@@ -47,14 +34,8 @@ export default function Palettes({ palettes, inventory }: PalettesProps) {
                 </a>
               </td>
               {item.threads.map((thread, i) => (
-                <td
-                  key={i}
-                  className={classnames(
-                    'palette_thread',
-                    palettes.length > 0 && !ownedThreads?.includes(thread) && 'not_owned_thread'
-                  )}
-                >
-                  {thread}
+                <td key={i} className={classnames('palette_thread', thread.owned && 'not_owned_thread')}>
+                  {thread.number}
                 </td>
               ))}
             </tr>
